@@ -1,0 +1,22 @@
+name: web-ci
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: web-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # 如有测试脚本，会自动运行；没有就跳过
+      - run: npm test --if-present

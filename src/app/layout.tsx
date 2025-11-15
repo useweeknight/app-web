@@ -2,10 +2,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 
 import "./globals.css";
-import { GA_MEASUREMENT_ID } from "@/lib/gtag";
-import { GAListener } from "@/app/_components/ga-listener";
+import { GA_MEASUREMENT_ID } from "../lib/gtag";
+import { GAListener } from "./_components/ga-listener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +31,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* GA 路由监听：每次路径变化上报 page_view */}
-        <GAListener />
+        {/* 用 Suspense 包一层 GAListener，满足 useSearchParams 的要求 */}
+        <Suspense fallback={null}>
+          <GAListener />
+        </Suspense>
 
-        {/* 应用内容 */}
+        {/* 页面实际内容 */}
         {children}
 
-        {/* 只有配置了 GA ID 才注入脚本，避免本地报错 */}
+        {/* 配置了 GA ID 才注入脚本，避免本地报错 */}
         {GA_MEASUREMENT_ID && (
           <>
             {/* 加载 GA4 gtag 脚本 */}

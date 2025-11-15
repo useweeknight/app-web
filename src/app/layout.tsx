@@ -1,6 +1,12 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import { Suspense } from "react";
+
 import "./globals.css";
+import { GA_MEASUREMENT_ID } from "../lib/gtag";
+import { GAListener } from "./_components/ga-listener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +31,35 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {/* 用 Suspense 包一层 GAListener，满足 useSearchParams 的要求 */}
+        <Suspense fallback={null}>
+          <GAListener />
+        </Suspense>
+
+        {/* 页面实际内容 */}
         {children}
+
+        {/* 配置了 GA ID 才注入脚本，避免本地报错 */}
+        {GA_MEASUREMENT_ID && (
+          <>
+            {/* 加载 GA4 gtag 脚本 */}
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+
+            {/* 初始化 gtag，关闭自动 send_page_view */}
+            <Script id="ga-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                window.gtag = gtag;
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: false });
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 # Weeknight · app-web · Cursor Context
 
-Last updated: 2025-11-15
+Last updated: 2025-11-30
 
 ## 0) What this repo is
 
@@ -82,3 +82,37 @@ const res = await fetch("https://api.useweeknight.com/generate-card?userId=USER_
   recipe / recipe_step / recipe_media / nutrition_snapshot 为唯一标准。
 
 更多统一的 Cursor 使用规范，见 ops-config/docs/CURSOR_HANDBOOK.md
+
+---
+
+## 7) 已完成工作（Step 7）
+
+### 登录与认证
+
+- `/login` - 支持 Apple/Google OAuth + Email/Password + Magic Link
+- `/auth/callback` - OAuth 回调处理，检查冷启动状态
+- `middleware.ts` - 路由保护（protected routes + admin routes）
+
+### 用户流程
+
+- `/onboarding` - 冷启动流程（家庭设置 → 滑卡偏好 → 完成）
+- `/tonight` - Tonight 主页（文本输入 + SuggestionCard 列表 + 配菜软入口）
+- `/cook` - 点按式烹饪界面（时间线 + 计时器 + 步骤控制）
+- `/grocery` - 过道分组购物清单（勾选 + 还差清单）
+- `/appliances` - 器具专题入口（Air Fryer/Sheet-pan/One-pot 等）
+- `/profile` - 用户资料页
+
+### API 客户端 (`src/lib/api.ts`)
+
+- Tonight API: `getTonightSuggestions()`
+- Recipes API: `searchRecipes()`, `getRecipeById()`, `getRecipeTimeline()`
+- Telemetry API: `sendTelemetry()`
+- Share Card API: `generateShareCard()`
+- Cook API (Step 7): `startCookSession()`, `sendCookAction()`, `getCookSession()`,
+  `createCookEventSource()`
+
+### UI 组件
+
+- `BottomNav` - 底部导航栏
+- `Button` / `Input` - 基础表单组件
+- 全局样式：`globals.css`（CSS 变量 + 暗色模式 + 动画）

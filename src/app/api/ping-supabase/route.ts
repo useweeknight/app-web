@@ -24,7 +24,8 @@ export async function GET() {
 
     if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     return NextResponse.json({ ok: true, ts: Date.now() });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
